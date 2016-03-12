@@ -1,6 +1,6 @@
 import os
 
-from telegram import Updater, User, ReplyKeyboardMarkup
+from telegram import Updater, User, ReplyKeyboardMarkup, ReplyKeyboardHide
 import logging
 import checker
 
@@ -11,25 +11,30 @@ logger.setLevel(logging.DEBUG)
 
 TOKEN = os.environ['TOKEN']
 
-users = dict()
+users = dict() #TODO server-side
+
+reply_awaiting_function = None
 
 
 class UserInfo:
     def __init__(self, telegram_user):
+        #TODO server-side
         self.user = telegram_user
         self.banks = dict()
 
-    def add_bank(self, bank_id):
-        self.banks[bank_id] = Bank(bank_id)
+    def add_bank(self, bank_name):
+        #TODO server-side
+        self.banks[bank_name] = Bank(bank_name)
 
-    def remove_bank(self, bank_id):
-        self.banks.pop(bank_id)
+    def remove_bank(self, bank_name):
+        #TODO server-side
+        self.banks.pop(bank_name)
 
 
 class Bank:
-    def __init__(self, bank_id):
-        self.bank_id = bank_id
-        self.bank_name = checker.get_bank_name_by_id(bank_id)
+    def __init__(self, bank_name):
+        self.bank_name = bank_name
+        self.bank_id = checker.get_bank_id_by_name(bank_name)
 
     def get_status(self):
         logger.info("Getting status for bank %s" % self.bank_id)
@@ -54,38 +59,41 @@ def help(bot, update):
 /getbanksstatuses - Получить информацию о состоянии банков из списка""")
 
 
-def add_bank_by_name(bot, update, args):
-    log_params('add_bank_by_name', update)
+def add_bank(bot, update, args):
+    global reply_awaiting_function
+    log_params('add_bank', update)
     if len(args) == 0:
         bot.sendMessage(update.message.chat_id, text="Использование:\n/addbank [Название]")
         return
     bank_name_guess = " ".join(args)
-    bank_ids_name_map = checker.get_bank_ids_name_map_guesses_by_name(bank_name_guess)  # key = id, value = name
-    if len(bank_ids_name_map) == 0:
+    bank_names_guesses_list = checker.get_bank_name_guesses(bank_name_guess)  # key = id, value = name
+    if len(bank_names_guesses_list) == 0:
         bot.sendMessage(update.message.chat_id, text="Никогда не слышал о таком банке")
-    elif len(bank_ids_name_map) == 1:
+    elif len(bank_names_guesses_list) == 1:
         telegram_user = update.message.from_user
-        bot.sendMessage(update.message.chat_id, text=add_bank_by_id(telegram_user, list(bank_ids_name_map.keys())[0]))
+        bot.sendMessage(update.message.chat_id, text=add_bank_by_name(telegram_user, bank_names_guesses_list[0]))
     else:
+        reply_awaiting_function = "add_bank"
         bot.sendMessage(update.message.chat_id,
                         text="Существует несколько банков с похожим названием. Какой вы имели в виду?",
-                        reply_markup=(ReplyKeyboardMarkup(get_choose_bank_keyboard(bank_ids_name_map))))
+                        reply_markup=(ReplyKeyboardMarkup(get_choose_bank_keyboard(bank_names_guesses_list))))
 
 
-def add_bank_by_id(telegram_user, bank_id):
+def add_bank_by_name(telegram_user, bank_name):
     if telegram_user.id not in users.keys():
         users[telegram_user.id] = UserInfo(telegram_user)
 
     user = users[telegram_user.id]
-    if bank_id not in user.banks.keys():
-        user.add_bank(bank_id)
+    if bank_name not in user.banks.keys():
+        user.add_bank(bank_name)
         return "Банк успешно добавлен"
     else:
         return "Банк уже есть в списке"
 
 
-def get_choose_bank_keyboard(bank_ids_name_map):
-    pass  # TODO
+def get_choose_bank_keyboard(bank_names_list):
+    return ReplyKeyboardMarkup(keyboard=[[i] for i in bank_names_list], one_time_keyboard=True, selective=True,
+                               resize_keyboard=True)
 
 
 def get_banks_statuses(bot, update, args):
@@ -103,7 +111,8 @@ def get_banks_statuses(bot, update, args):
             bot.sendMessage(update.message.chat_id, text=bank.get_status())
 
 
-def remove_bank(bot, update, args):
+def remove_bank(bot, update):
+    global reply_awaiting_function
     telegram_user = update.message.from_user
     if telegram_user.id not in users.keys():
         users[telegram_user.id] = UserInfo(telegram_user)
@@ -114,28 +123,41 @@ def remove_bank(bot, update, args):
                         text="Список банков пуст. Сперва добавьте банк в список с помощью команды\n"
                              "/addbank [Название]")
     else:
-        bank_ids_name_map = dict()
-        for bank in user.banks.values():
-            bank_ids_name_map[bank.bank_id] = bank.bank_name
+        reply_awaiting_function = "remove_bank"
         bot.sendMessage(update.message.chat_id,
                         text="Выберите банк",
-                        reply_markup=(ReplyKeyboardMarkup(get_choose_bank_keyboard(bank_ids_name_map))))
+                        reply_markup=(get_choose_bank_keyboard(user.banks.keys())))
 
 
-def remove_bank_by_id(telegram_user, bank_id):
+def remove_bank_by_name(telegram_user, bank_name):
+    bank_id = checker.get_bank_name_guesses(bank_name)
     if telegram_user.id not in users.keys():
         users[telegram_user.id] = UserInfo(telegram_user)
 
     user = users[telegram_user.id]
-    if bank_id not in user.banks.keys():
+    if bank_name not in user.banks.keys():
         user.remove_bank(bank_id)
         return "Банк успешно удален"
     else:
         return "Банка не было в списке"
 
 
-bot_functions = {"help": help, "addbank": add_bank_by_name, "removebank": remove_bank,
+bot_functions = {"help": help, "addbank": add_bank, "removebank": remove_bank,
                  "getbanksstatuses": get_banks_statuses}
+
+
+def bank_name_answer_handler(bot, update, args):
+    global reply_awaiting_function
+    if reply_awaiting_function == "remove_bank":
+        bot.sendMessage(update.message.chat_id,
+                        text=remove_bank_by_name(update.message.from_user, update.message.text),
+                        reply_markup=ReplyKeyboardHide())
+    elif reply_awaiting_function == "add_bank":
+        bot.sendMessage(update.message.chat_id,
+                        text=add_bank_by_name(update.message.from_user, update.message.text),
+                        reply_markup=ReplyKeyboardHide())
+
+    reply_awaiting_function = None
 
 
 def main():
@@ -143,10 +165,11 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Add handlers for Telegram messages
+    # Add handlers for Telegram commands
     for (name, f) in bot_functions.items():
         dp.addTelegramCommandHandler(name, f)
 
+    dp.addTelegramMessageHandler(bank_name_answer_handler)
     updater.start_polling()
     updater.idle()
 
