@@ -1,13 +1,20 @@
-# import psycopg2
-#
-# # Try to connect
-#
-# try:
-#     conn=psycopg2.connect("dbname='template1' user='dbuser' password='mypass'")
-# except:
-#     print("I am unable to connect to the database.")
-#
-# cur = conn.cursor()
+import os
+
+import psycopg2
+
+# Try to connect
+cur = None
+try:
+    password = os.environ['ESCAPEBANKDBPASS']
+    conn = psycopg2.connect("host='localhost' dbname='escapebank' user='postgres' password='%s'" % password)
+    cur = conn.cursor()
+except Exception as err:
+    print("I am unable to connect to the database: ", str(err))
+
+cur.execute("""SELECT * FROM banks LIMIT 3""")
+rows = cur.fetchall()
+for row in rows:
+    print("   ", row[0])
 
 def get_status(bank_id):
     return "Банк .... \n" \
