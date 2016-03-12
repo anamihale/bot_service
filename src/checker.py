@@ -16,7 +16,7 @@ except Exception as err:
 def add_subscription(user_id, bank_id):
     global cur
     global conn
-    print("Adding subscrition")
+    print("Adding subscrition", user_id, bank_id)
     cur.execute("SELECT * FROM subscriptions WHERE user_id=%s AND bank_id=%s", (user_id, bank_id))
     rows = cur.fetchall()
     if len(rows) == 0:
@@ -43,6 +43,15 @@ def remove_subscription(user_id, bank_id):
         return "Банк не был в списке"
 
 
+
+def remove_user(user_id):
+    global cur
+    global conn
+    cur.execute("DELETE FROM subscriptions WHERE user_id=%s", (user_id,))
+    print(cur.query)
+    conn.commit()
+
+
 def get_user_subscriptions(user_id):
     global cur
     global conn
@@ -63,7 +72,7 @@ def get_bank_name(bank_id):
 def get_bank_id(bank_name):
     global cur
     global conn
-    cur.execute("SELECT id FROM banks WHERE name='%s'", (bank_name,))
+    cur.execute("SELECT id FROM banks WHERE name=%s", (bank_name,))
     return cur.fetchone()[0]
 
 
@@ -80,7 +89,7 @@ def get_bank_name_guesses(bank_name):
 
 def get_bank_names():
     names = set()
-    cur.execute("SELECT name FROM banks")
+    cur.execute("SELECT name FROM banks LIMIT 10")
     for rec in cur:
         names.add(rec[0])
     return names

@@ -56,7 +56,7 @@ def add_bank(bot, update, args):
 
 def add_subscription(telegram_user, bank_name):
     if bank_name in all_banks:
-        return checker.add_subscription(telegram_user, checker.get_bank_id(bank_name))
+        return checker.add_subscription(telegram_user.id, checker.get_bank_id(bank_name))
     else:
         return "Никогда не слышал о таком банке"
 
@@ -95,7 +95,7 @@ def remove_bank(bot, update):
 
 def remove_subscription(telegram_user, bank_name):
     if bank_name in all_banks:
-        return checker.remove_subscription(telegram_user, checker.get_bank_id(bank_name))
+        return checker.remove_subscription(telegram_user.id, checker.get_bank_id(bank_name))
     else:
         return "Никогда не слышал о таком банке"
 
