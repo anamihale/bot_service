@@ -62,6 +62,17 @@ def get_bank_id(bank_name):
 	return cur.fetchone()[0]
 
 
+def get_bank_name_guesses(bank_name):
+	global cur
+	global conn
+	cur.execute("SELECT id FROM synonyms WHERE name LIKE '%" + bank_name + "%'")
+	print(cur.query)
+	banks = set()
+	for rec in cur:
+		banks.add(rec[0])
+	return banks
+
+
 def get_bank_names():
 	names = set()
 	cur.execute("SELECT name FROM banks")
