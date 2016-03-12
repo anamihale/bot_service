@@ -1,3 +1,5 @@
+import os
+
 from telegram import Updater, User, ReplyKeyboardMarkup
 import logging
 import checker
@@ -7,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-TOKEN = '199327503:AAEfqxWvl5QzS8dxq98ndrPDkCKechgaths'
+TOKEN = os.environ['TOKEN']
 
 users = dict()
 
