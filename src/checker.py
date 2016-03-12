@@ -9,13 +9,9 @@
 #
 # cur = conn.cursor()
 
-def get_bank_name_by_id(bank_id):
-    pass  # TODO
-
-
 def get_status(bank_id):
-    return get_bank_name_by_id(bank_id) + "\n" \
-                                          "ok"
+    return "Банк .... \n" \
+           "За последние полгода нормативы нарушались 6 раз (по нормативу Н1 - 5 раз, по нормативу Н2 - 1 раз)"
 
 
 def get_bank_name_guesses(bank_name):
@@ -23,4 +19,4 @@ def get_bank_name_guesses(bank_name):
 
 
 def get_bank_id_by_name(bank_name):
-    return None #TODO
+    return None  # TODO

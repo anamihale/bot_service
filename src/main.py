@@ -51,12 +51,11 @@ def log_params(method_name, update):
 
 def help(bot, update):
     log_params('help', update)
-    bot.sendMessage(update.message.chat_id
-                    , text="""Поддерживаемые команды:
+    bot.sendMessage(update.message.chat_id, text="""Поддерживаемые команды:
 /help - Помощь
 /addbank - Добавить банк в список интересующих
 /removebank - Удалить банк из списка интересующих
-/getbanksstatuses - Получить информацию о состоянии банков из списка""")
+/getbanksstatuses - Получить информацию о состоянии банков из списка""", reply_markup=ReplyKeyboardHide())
 
 
 def add_bank(bot, update, args):
