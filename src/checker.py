@@ -11,6 +11,10 @@ try:
 except Exception as err:
     print("I am unable to connect to the database: ", str(err))
 
+cur.execute("""SELECT * FROM banks LIMIT 3""")
+rows = cur.fetchall()
+for row in rows:
+    print("   ", row[0])
 
 def get_status(bank_id):
     return "Банк .... \n" \
