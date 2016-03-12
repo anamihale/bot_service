@@ -1,4 +1,4 @@
-from telegram import Updater, User
+from telegram import Updater, User, ReplyKeyboardMarkup
 import logging
 import checker
 
@@ -49,7 +49,7 @@ def help(bot, update):
 
 
 def get_bank_id_guesses_by_name(bank_name):
-    return []
+    return dict()  # TODO
 
 
 def add_bank_by_name(bot, update, args):
@@ -57,13 +57,17 @@ def add_bank_by_name(bot, update, args):
     if len(args) == 0:
         bot.sendMessage(update.message.chat_id, text="Использование:\n/addbank [Название]")
         return
-    bank_name = " ".join(args)
-    bank_ids = get_bank_id_guesses_by_name(bank_name)
-    if len(bank_ids) == 0:
+    bank_name_guess = " ".join(args)
+    bank_ids_name_map = get_bank_id_guesses_by_name(bank_name_guess)  # key = id, value = name
+    if len(bank_ids_name_map) == 0:
         bot.sendMessage(update.message.chat_id, text="Никогда не слышал о таком банке")
-    elif len(bank_ids) == 1:
+    elif len(bank_ids_name_map) == 1:
         telegram_user = update.message.from_user
-        bot.sendMessage(update.message.chat_id, text=add_bank_by_id(telegram_user, bank_ids[0]))
+        bot.sendMessage(update.message.chat_id, text=add_bank_by_id(telegram_user, bank_ids_name_map.values()[0]))
+    else:
+        bot.sendMessage(update.message.chat_id,
+                        text="Существует несколько банков с похожим названием. Какой вы имели в виду?",
+                        reply_markup=(ReplyKeyboardMarkup(get_choose_bank_keyboard(bank_ids_name_map))))
 
 
 def add_bank_by_id(telegram_user, bank_id):
@@ -76,3 +80,35 @@ def add_bank_by_id(telegram_user, bank_id):
         return "Банк успешно добавлен"
     else:
         return "Банк уже есть в списке"
+
+
+def get_choose_bank_keyboard(bank_ids_name_map):
+    pass  # TODO
+
+
+def get_banks_statuses(bot, update, args):
+    pass  # TODO
+
+
+def remove_bank_by_id(bot, update, args):
+    pass  # TODO
+
+
+def main():
+    updater = Updater(TOKEN)
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
+
+    # Add handlers for Telegram messages
+    for (name, f) in bot_functions:
+        dp.addTelegramCommandHandler(name, f)
+
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
+
+bot_functions = {"help": help, "addbank": add_bank_by_name, "removebank": remove_bank_by_id,
+                 "getbanksstatuses": get_banks_statuses}
