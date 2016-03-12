@@ -38,8 +38,8 @@ def add_bank(bot, update, args):
     if len(args) == 0:
         reply_awaiting_function = add_subscription
         bot.sendMessage(update.message.chat_id, text="Использование:\n/addbank [Название]\n"
-                                                     "Но можете попробовать найти свой банк в полном списке",
-                        reply_markup=(get_choose_bank_keyboard(sorted(all_banks))))
+                                                     "Но может быть вам повезет и банк будет в предложеном списке",
+                        reply_markup=(get_choose_bank_keyboard(sorted(all_banks[:10]))))
     else:
         user_guess = " ".join(args)
         bank_names_guesses_list = sorted([checker.get_bank_name(i) for i in checker.get_bank_name_guesses(user_guess)])

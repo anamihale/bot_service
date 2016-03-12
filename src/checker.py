@@ -89,7 +89,7 @@ def get_bank_name_guesses(bank_name):
 
 def get_bank_names():
     names = set()
-    cur.execute("SELECT name FROM banks LIMIT 10")
+    cur.execute("SELECT name FROM banks")
     for rec in cur:
         names.add(rec[0])
     return names
