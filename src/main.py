@@ -11,7 +11,7 @@ logger.setLevel(logging.DEBUG)
 
 TOKEN = os.environ['TOKEN']
 reply_awaiting_function = None
-all_banks = checker.get_all_banks_names()
+all_banks = checker.get_bank_names()
 
 def log_params(method_name, update):
     logger.debug("Method: %s\nFrom: %s\nchat_id: %d\nText: %s" %
@@ -39,8 +39,8 @@ def add_bank(bot, update, args):
                                                      "Но можете попробовать найти свой банк в полном списке",
                         reply_markup=(get_choose_bank_keyboard(sorted(all_banks))))
     else:
-        bank_name_guess = " ".join(args)
-        bank_names_guesses_list = checker.get_bank_name_guesses(bank_name_guess)
+        user_guess = " ".join(args)
+        bank_names_guesses_list = sorted([checker.get_bank_name(i) for i in checker.get_bank_name_guesses(user_guess)])
         if len(bank_names_guesses_list) == 0:
             bot.sendMessage(update.message.chat_id, text="Никогда не слышал о таком банке")
         elif len(bank_names_guesses_list) == 1:
@@ -56,7 +56,7 @@ def add_bank(bot, update, args):
 
 def add_subscription(telegram_user, bank_name):
     if bank_name in all_banks:
-        return checker.add_subscription(telegram_user, bank_name)
+        return checker.add_subscription(telegram_user, checker.get_bank_id(bank_name))
     else:
         return "Никогда не слышал о таком банке"
 
@@ -68,20 +68,20 @@ def get_choose_bank_keyboard(bank_names_list):
 
 def get_banks_statuses(bot, update, args):
     telegram_user = update.message.from_user.id
-    user_banks_names = checker.get_user_subscriptions(telegram_user)
-    if len(user_banks_names) < 1:
+    user_banks_ids = checker.get_user_subscriptions(telegram_user)
+    if len(user_banks_ids) < 1:
         bot.sendMessage(update.message.chat_id,
                         text="Список банков пуст. Сперва добавьте банк в список с помощью команды\n"
                              "/addbank [Название]")
     else:
-        for bank in user_banks_names:
-            bot.sendMessage(update.message.chat_id, text=checker.get_status(bank))
+        for bank_id in user_banks_ids:
+            bot.sendMessage(update.message.chat_id, text=checker.get_status(bank_id))
 
 
 def remove_bank(bot, update):
     global reply_awaiting_function
     telegram_user = update.message.from_user.id
-    user_banks_names = checker.get_user_subscriptions(telegram_user)
+    user_banks_names = [checker.get_bank_name(bank_id) for bank_id in checker.get_user_subscriptions(telegram_user)]
     if len(user_banks_names) < 1:
         bot.sendMessage(update.message.chat_id,
                         text="Список банков пуст. Сперва добавьте банк в список с помощью команды\n"
@@ -95,7 +95,7 @@ def remove_bank(bot, update):
 
 def remove_subscription(telegram_user, bank_name):
     if bank_name in all_banks:
-        return checker.remove_subscription(telegram_user, bank_name)
+        return checker.remove_subscription(telegram_user, checker.get_bank_id(bank_name))
     else:
         return "Никогда не слышал о таком банке"
 
