@@ -54,17 +54,13 @@ def help(bot, update):
 /getbanksstatuses - Получить информацию о состоянии банков из списка""")
 
 
-def get_bank_id_guesses_by_name(bank_name):
-    return dict()  # TODO
-
-
 def add_bank_by_name(bot, update, args):
     log_params('add_bank_by_name', update)
     if len(args) == 0:
         bot.sendMessage(update.message.chat_id, text="Использование:\n/addbank [Название]")
         return
     bank_name_guess = " ".join(args)
-    bank_ids_name_map = get_bank_id_guesses_by_name(bank_name_guess)  # key = id, value = name
+    bank_ids_name_map = checker.get_bank_ids_name_map_guesses_by_name(bank_name_guess)  # key = id, value = name
     if len(bank_ids_name_map) == 0:
         bot.sendMessage(update.message.chat_id, text="Никогда не слышал о таком банке")
     elif len(bank_ids_name_map) == 1:
