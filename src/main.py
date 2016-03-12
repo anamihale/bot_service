@@ -93,6 +93,8 @@ def get_banks_statuses(bot, update, args):
 def remove_bank_by_id(bot, update, args):
     pass  # TODO
 
+bot_functions = {"help": help, "addbank": add_bank_by_name, "removebank": remove_bank_by_id,
+                 "getbanksstatuses": get_banks_statuses}
 
 def main():
     updater = Updater(TOKEN)
@@ -100,7 +102,7 @@ def main():
     dp = updater.dispatcher
 
     # Add handlers for Telegram messages
-    for (name, f) in bot_functions:
+    for (name, f) in bot_functions.items():
         dp.addTelegramCommandHandler(name, f)
 
     updater.start_polling()
@@ -110,5 +112,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-bot_functions = {"help": help, "addbank": add_bank_by_name, "removebank": remove_bank_by_id,
-                 "getbanksstatuses": get_banks_statuses}
