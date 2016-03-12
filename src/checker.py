@@ -4,12 +4,15 @@ import psycopg2
 
 # Try to connect
 cur = None
-try:
-    password = os.environ['ESCAPEBANKDBPASS']
-    conn = psycopg2.connect("host='localhost' dbname='escapebank' user='postgres' password='%s'" % password)
-    cur = conn.cursor()
-except:
-    print("I am unable to connect to the database.")
+password = os.environ['ESCAPEBANKDBPASS']
+conn = psycopg2.connect("host='localhost' dbname='escapebank' user='postgres' password='%s'" % password)
+cur = conn.cursor()
+# try:
+#     password = os.environ['ESCAPEBANKDBPASS']
+#     conn = psycopg2.connect("host='localhost' dbname='escapebank' user='postgres' password='%s'" % password)
+#     cur = conn.cursor()
+# except Exception:
+#     print("I am unable to connect to the database.")
 
 
 def get_status(bank_id):
