@@ -129,15 +129,17 @@ def get_status(bank_id):
              ['01/01/2016', 'Н1.0', '8', 'min'], ['01/01/2016', 'Н1.1', '4.5', 'min']]
 
     vals = get_norm_values(bank_id)
+    print(vals)
 
-    l_vals = sorted(vals, key=lambda x: x[2], reverse=True)
-    final_date = l_vals[0][2]
+    norm_vals_sorted = sorted(vals, key=lambda x: x[2], reverse=True)
+    print(norm_vals_sorted)
+    final_date = norm_vals_sorted[0][2]
 
     count = 0
-    while count < len(l_vals) and l_vals[count][2] > final_date - timedelta(days=182):
+    while count < len(norm_vals_sorted) and norm_vals_sorted[count][2] > final_date - timedelta(days=182):
         count += 1
-    l_vals = l_vals[:count]
-    violations = is_violation(norms, l_vals)
+    norm_vals_sorted = norm_vals_sorted[:count]
+    violations = is_violation(norms, norm_vals_sorted)
 
     if violations['total'] == 0:
         half_year = "У банка за за полгода до %s наружений не было" % final_date
@@ -149,10 +151,10 @@ def get_status(bank_id):
                 half_year += "норматив %s - %d раз \n" % (key, value)
 
     count_m = 0
-    while count_m < len(l_vals) and l_vals[count_m][2] > final_date - timedelta(days=30):
+    while count_m < len(norm_vals_sorted) and norm_vals_sorted[count_m][2] > final_date - timedelta(days=30):
         count_m += 1
-    l_vals = l_vals[:count_m]
-    violations_m = is_violation(norms, l_vals)
+    norm_vals_sorted = norm_vals_sorted[:count_m]
+    violations_m = is_violation(norms, norm_vals_sorted)
 
     total_violations_m = violations_m['total'] == 0
     if total_violations_m:
