@@ -170,4 +170,4 @@ def get_status(bank_id):
     elif not total_violations_m and violations['total'] - violations_m['total'] != 0:
         signal = "Красный сигнал опасности. Нарушения существуют длительное время.\n"
 
-    return signal, month, half_year
+    return signal, month + half_year
