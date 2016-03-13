@@ -14,8 +14,6 @@ except Exception as err:
 
 
 def add_subscription(user_id, bank_id):
-    global cur
-    global conn
     print("Adding subscrition", user_id, bank_id)
     cur.execute("SELECT * FROM subscriptions WHERE user_id=%s AND bank_id=%s", (user_id, bank_id))
     rows = cur.fetchall()
@@ -29,8 +27,6 @@ def add_subscription(user_id, bank_id):
 
 
 def remove_subscription(user_id, bank_id):
-    global cur
-    global conn
     cur.execute("SELECT * FROM subscriptions WHERE user_id=%s AND bank_id=%s", (user_id, bank_id))
     print(cur.query)
     rows = cur.fetchall()
@@ -45,16 +41,12 @@ def remove_subscription(user_id, bank_id):
 
 
 def remove_user(user_id):
-    global cur
-    global conn
     cur.execute("DELETE FROM subscriptions WHERE user_id=%s", (user_id,))
     print(cur.query)
     conn.commit()
 
 
 def get_user_subscriptions(user_id):
-    global cur
-    global conn
     cur.execute("SELECT bank_id FROM subscriptions WHERE user_id=%s", (user_id,))
     banks = set()
     for rec in cur:
@@ -63,22 +55,16 @@ def get_user_subscriptions(user_id):
 
 
 def get_bank_name(bank_id):
-    global cur
-    global conn
     cur.execute("SELECT name FROM banks WHERE id=%s", (bank_id,))
     return cur.fetchone()[0]
 
 
 def get_bank_id(bank_name):
-    global cur
-    global conn
     cur.execute("SELECT id FROM banks WHERE name=%s", (bank_name,))
     return cur.fetchone()[0]
 
 
 def get_bank_name_guesses(bank_name):
-    global cur
-    global conn
     cur.execute("SELECT id FROM synonyms WHERE name LIKE '%" + bank_name + "%'")
     print(cur.query)
     banks = set()
@@ -93,6 +79,14 @@ def get_bank_names():
     for rec in cur:
         names.add(rec[0])
     return names
+
+
+def get_norm_values(bank_id):
+	norm_values = set()
+	cur.execute("SELECT norm,value,date FROM norm_values WHERE id=%s", (bank_id,))
+	for rec in cur:
+		norm_values.add((rec[0], rec[1], rec[2]))
+	return norm_values
 
 
 def get_status(bank_id):
