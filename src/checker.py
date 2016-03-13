@@ -168,7 +168,7 @@ def get_status(bank_id):
     elif total_violations_m and violations['total'] - violations_m['total'] != 0:
         signal = Emoji.YELLOW_HEART + "Желтый сигнал опасности. У банка недавно были нарушения.\n"
     elif not total_violations_m and violations['total'] - violations_m['total'] == 0:
-        signal = Emoji.DANCER + "Оранжевый сигнал опасности. У банка появились нарушения.\n"
+        signal = Emoji.WARNING_SIGN + "Оранжевый сигнал опасности. У банка появились нарушения.\n"
     elif not total_violations_m and violations['total'] - violations_m['total'] != 0:
         signal = Emoji.RUNNER + "Красный сигнал опасности. Нарушения существуют длительное время.\n"
 
