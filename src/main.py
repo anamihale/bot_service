@@ -35,7 +35,8 @@ def help(bot, update):
 
 def get_random_list(input_list, n=10):
     size = len(input_list)
-    return set([input_list[random.randint(0, size)] for i in range(min(n, size))])
+    inp = list(input_list)
+    return set([inp[random.randint(0, size)] for i in range(min(n, size))])
 
 
 def add_bank(bot, update, args):
