@@ -149,7 +149,7 @@ def get_status(bank_id):
     month = ""
     half_year = ""
     if total_violations_m and violations['total'] - violations_m['total'] == 0:
-        signal = Emoji.GREEN_HEART + "Зеленый сигнал. Опасности нет.\n"
+        signal = Emoji.GREEN_HEART + "Зеленый сигнал. Опасности в банке %s нет.\n"%(get_bank_name(bank_id))
     elif total_violations_m and violations['total'] - violations_m['total'] != 0:
         signal = Emoji.YELLOW_HEART + "Желтый сигнал опасности. У банка недавно были нарушения.\n"
         half_year = "Всего за полгода до %s у банка %s было %d нарушений. Из них нарушены: \n" % (
