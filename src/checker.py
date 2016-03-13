@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from telegram import Emoji
 import os
 
 import psycopg2
@@ -127,7 +128,7 @@ def get_status(bank_id):
     norm_vals_sorted = sorted(vals, key=lambda x: x[2], reverse=True)
     print(norm_vals_sorted)
     if len(norm_vals_sorted)<1:
-        return "Нет данных о нарушениях нормативов банком %s" % (get_bank_name(bank_id)), ""
+        return Emoji.GREEN_HEART + "Нет данных о нарушениях нормативов банком %s" % (get_bank_name(bank_id)), ""
     final_date = norm_vals_sorted[0][2]
 
     count = 0
@@ -137,7 +138,7 @@ def get_status(bank_id):
     violations = is_violation(norms, norm_vals_sorted)
 
     if violations['total'] == 0:
-        half_year = "У банка %s за за полгода до %s наружений не было" % (get_bank_name(bank_id), final_date)
+        half_year = "У банка %s за полгода до %s наружений не было" % (get_bank_name(bank_id), final_date)
     else:
         half_year = "Всего за полгода до %s у банка %s было %d нарушений. Из них нарушены: \n" % (
             get_bank_name(bank_id), final_date, violations['total'])
@@ -163,12 +164,12 @@ def get_status(bank_id):
 
     signal = ""
     if total_violations_m and violations['total'] - violations_m['total'] == 0:
-        signal = "Зеленый сигнал. Опасности нет.\n"
+        signal = Emoji.GREEN_HEART + "Зеленый сигнал. Опасности нет.\n"
     elif total_violations_m and violations['total'] - violations_m['total'] != 0:
-        signal = "Желтый сигнал опасности. У банка недавно были нарушения.\n"
+        signal = Emoji.YELLOW_HEART + "Желтый сигнал опасности. У банка недавно были нарушения.\n"
     elif not total_violations_m and violations['total'] - violations_m['total'] == 0:
-        signal = "Оранжевый сигнал опасности. У банка появились нарушения.\n"
+        signal = Emoji.DANCER + "Оранжевый сигнал опасности. У банка появились нарушения.\n"
     elif not total_violations_m and violations['total'] - violations_m['total'] != 0:
-        signal = "Красный сигнал опасности. Нарушения существуют длительное время.\n"
+        signal = Emoji.RUNNER + "Красный сигнал опасности. Нарушения существуют длительное время.\n"
 
     return signal, month + half_year
