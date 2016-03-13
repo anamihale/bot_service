@@ -128,8 +128,9 @@ def get_status(bank_id):
 
     norm_vals_sorted = sorted(vals, key=lambda x: x[2], reverse=True)
     print(norm_vals_sorted)
+    bank_name = get_bank_name(bank_id)
     if len(norm_vals_sorted) < 1:
-        return Emoji.GREEN_HEART + "Нет данных о нарушениях нормативов банком %s" % (get_bank_name(bank_id)), ""
+        return Emoji.GREEN_HEART + "Нет данных о нарушениях нормативов банком %s" % (bank_name), ""
     final_date = norm_vals_sorted[0][2]
 
     count = 0
@@ -150,26 +151,25 @@ def get_status(bank_id):
     month = ""
     half_year = ""
     if total_violations_m and violations['total'] - violations_m['total'] == 0:
-        signal = Emoji.GREEN_HEART + "Зеленый сигнал. Опасности в банке %s нет.\n" % (get_bank_name(bank_id))
+        signal = Emoji.GREEN_HEART + "Зеленый сигнал. Опасности в банке %s нет.\n" % bank_name
     elif total_violations_m and violations['total'] - violations_m['total'] != 0:
-        signal = Emoji.YELLOW_HEART + "Желтый сигнал опасности. У банка недавно были нарушения.\n"
-        half_year = "Всего за полгода до %s у банка %s было %d нарушений. Из них нарушены: \n" % (
-            get_bank_name(bank_id), final_date, violations['total'])
+        signal = Emoji.YELLOW_HEART + "Желтый сигнал опасности. У банка %s недавно были нарушения.\n" %bank_name
+        half_year = "Всего за полгода до %s у банка было %d нарушений. Из них нарушены: \n" % (
+            final_date, violations['total'])
         for key, value in violations.items():
             if key != 'total' and value != 0:
                 half_year += "норматив %s - %d раз \n" % (key, value)
     elif not total_violations_m and violations['total'] - violations_m['total'] == 0:
-        signal = Emoji.WARNING_SIGN + "Оранжевый сигнал опасности. У банка %s появились нарушения.\n" % get_bank_name(
-            bank_id)
+        signal = Emoji.WARNING_SIGN + "Оранжевый сигнал опасности. У банка %s появились нарушения.\n" % bank_name
         month = "Всего за месяц до %s у банка было %d нарушений. Из них нарушены:\n" % (
             final_date, violations_m['total'])
         for key, value in violations_m.items():
             if key != 'total' and value != 0:
                 month += "норматив %s - %d раз \n" % (key, value)
     elif not total_violations_m and violations['total'] - violations_m['total'] != 0:
-        signal = Emoji.RUNNER + "Красный сигнал опасности. Нарушения существуют длительное время.\n"
-        half_year = "Всего за полгода до %s у банка %s было %d нарушений. Из них нарушены: \n" % (
-            get_bank_name(bank_id), final_date, violations['total'])
+        signal = Emoji.RUNNER + "Красный сигнал опасности. Нарушения у банка %s существуют длительное время.\n" % bank_name
+        half_year = "Всего за полгода до %s у банка было %d нарушений. Из них нарушены: \n" % (
+            final_date, violations['total'])
         for key, value in violations.items():
             if key != 'total' and value != 0:
                 half_year += "норматив %s - %d раз \n" % (key, value)
