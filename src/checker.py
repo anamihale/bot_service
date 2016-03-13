@@ -92,6 +92,7 @@ def get_bank_names():
 def get_norm_values(bank_id):
     norm_values = set()
     cur.execute("SELECT norm,value,date FROM norm_values WHERE id=%s", (bank_id,))
+    print(cur.query)
     for rec in cur:
         norm_values.add((rec[0], rec[1], rec[2]))
     return norm_values
