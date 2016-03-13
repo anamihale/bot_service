@@ -127,7 +127,7 @@ def get_status(bank_id):
     norm_vals_sorted = sorted(vals, key=lambda x: x[2], reverse=True)
     print(norm_vals_sorted)
     if len(norm_vals_sorted)<1:
-        return "Нет данных по банку %s" % (get_bank_name(bank_id),), ""
+        return "Нет данных о нарушениях нормативов банком %s" % (get_bank_name(bank_id)), ""
     final_date = norm_vals_sorted[0][2]
 
     count = 0
