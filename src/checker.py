@@ -126,7 +126,7 @@ def get_status(bank_id):
     norm_vals_sorted = sorted(vals, key=lambda x: x[2], reverse=True)
     print(norm_vals_sorted)
     if len(norm_vals_sorted)<1:
-        return "Нет данных по банку", ""
+        return "Нет данных по банку %s" % (get_bank_name(bank_id),), ""
     final_date = norm_vals_sorted[0][2]
 
     count = 0
@@ -136,10 +136,10 @@ def get_status(bank_id):
     violations = is_violation(norms, norm_vals_sorted)
 
     if violations['total'] == 0:
-        half_year = "У банка за за полгода до %s наружений не было" % final_date
+        half_year = "У банка %s за за полгода до %s наружений не было" % (get_bank_name(bank_id), final_date)
     else:
-        half_year = "Всего за полгода до %s у банка было %d нарушений. Из них нарушены: \n" % (
-            final_date, violations['total'])
+        half_year = "Всего за полгода до %s у банка %s было %d нарушений. Из них нарушены: \n" % (
+            get_bank_name(bank_id), final_date, violations['total'])
         for key, value in violations.items():
             if key != 'total' and value != 0:
                 half_year += "норматив %s - %d раз \n" % (key, value)
@@ -152,7 +152,7 @@ def get_status(bank_id):
 
     total_violations_m = violations_m['total'] == 0
     if total_violations_m:
-        month = "У банка за за месяц до %s наружений не было" % final_date
+        month = "У банка за месяц до %s наружений не было" % final_date
     else:
         month = "Всего за месяц до %s у банка было %d нарушений. Из них нарушены:\n" % (
             final_date, violations_m['total'])
