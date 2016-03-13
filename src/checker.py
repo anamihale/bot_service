@@ -96,14 +96,6 @@ def get_norm_values(bank_id):
         norm_values.add((rec[0], rec[1], rec[2]))
     return norm_values
 
-
-def get_status(bank_id):
-    return "Банк .... \n" \
-           "За последние полгода нормативы нарушались 6 раз (по нормативу Н1 - 5 раз, по нормативу Н2 - 1 раз)"
-
-
-
-
 def get_status(bank_id):
     def is_violation(norms, value):
         violations = {'total': 0}
@@ -127,10 +119,14 @@ def get_status(bank_id):
              ['01/01/2001', 'Н16', '100', 'max'], ['01/01/2001', 'Н16.1', '0', 'max'],
              ['01/01/2001', 'Н18', '100', 'min'], ['01/01/2015', 'Н1.2', '6', 'min'],
              ['01/01/2016', 'Н1.0', '8', 'min'], ['01/01/2016', 'Н1.1', '4.5', 'min']]
-    
+
     vals = get_norm_values(bank_id)
+    print(vals)
 
     norm_vals_sorted = sorted(vals, key=lambda x: x[2], reverse=True)
+    print(norm_vals_sorted)
+    if (norm_vals_sorted):
+        return "Нет данных по банку", ""
     final_date = norm_vals_sorted[0][2]
 
     count = 0

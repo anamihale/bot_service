@@ -87,7 +87,8 @@ def get_banks_statuses(bot, update, args):
                              "/addbank [Название]")
     else:
         for bank_id in user_banks_ids:
-            bot.sendMessage(update.message.chat_id, text=checker.get_status(bank_id))
+            status, text = checker.get_status(bank_id)
+            bot.sendMessage(update.message.chat_id, text=status+text)
 
 
 def remove_bank(bot, update):

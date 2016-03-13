@@ -16,6 +16,6 @@ for (user_id, bank_id) in subscriptions:
                         text="Обновились данные о финансовом состоянии интересующих вас банков")
 
 for (user_id, bank_id) in subscriptions:
-    text = checker.get_status(bank_id)
-    print("Оповещаю пользователя ", user_id, " o том, что \n", text)
-    bot.sendMessage(chat_id=int(user_id), text=text)
+    status, text = checker.get_status(bank_id)
+    print("Оповещаю пользователя ", user_id, " o том, что \n", status + text)
+    bot.sendMessage(chat_id=int(user_id), text=status + text)
