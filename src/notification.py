@@ -15,4 +15,4 @@ def notify_users():
             bot.sendMessage(chat_id=user_id, text="Обновились данные о финансовом состоянии интересующих вас банков")
 
     for (user_id, bank_id) in subscriptions:
-        bot.sendMessage(chat_id=user_id, text=checker.get_status(bank_id))
+        bot.sendMessage(chat_id=user_id, text=checker.get_status(checker.get_bank_name(bank_id)))
