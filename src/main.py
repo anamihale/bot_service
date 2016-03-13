@@ -1,6 +1,7 @@
 import os
+import random
 
-from telegram import Updater, User, ReplyKeyboardMarkup, ReplyKeyboardHide
+from telegram import Updater, ReplyKeyboardMarkup, ReplyKeyboardHide
 import logging
 import checker
 
@@ -25,28 +26,36 @@ def log_params(method_name, update):
 def help(bot, update):
     log_params('help', update)
     bot.sendMessage(update.message.chat_id, text="""Поддерживаемые команды:
-/help - Помощь
-/addbank - Добавить банк в список интересующих
+/help - Получить список доступных команд
+/addbank [Название] - Добавить банк в список интересующих
 /removebank - Удалить банк из списка интересующих
 /getbanksstatuses - Получить информацию о состоянии банков из списка
 /stop - Прекратить получать уведомления, очистить список""", reply_markup=ReplyKeyboardHide())
 
 
+def get_random_list(input_list, n=10):
+    size = len(input_list)
+    return set([input_list[random.randint(0, size)] for i in range(min(n, size))])
+
+
 def add_bank(bot, update, args):
     global reply_awaiting_function
     log_params('add_bank', update)
+    telegram_user = update.message.from_user.id
+    already_subscribed = set([checker.get_bank_name(i) for i in checker.get_user_subscriptions(telegram_user)])
     if len(args) == 0:
         reply_awaiting_function = add_subscription
         bot.sendMessage(update.message.chat_id, text="Использование:\n/addbank [Название]\n"
                                                      "Но может быть вам повезет и банк будет в предложеном списке",
-                        reply_markup=(get_choose_bank_keyboard(sorted(list(all_banks)[:10]))))
+                        reply_markup=(
+                            get_choose_bank_keyboard(sorted(get_random_list(all_banks - already_subscribed)))))
     else:
         user_guess = " ".join(args)
-        bank_names_guesses_list = sorted([checker.get_bank_name(i) for i in checker.get_bank_name_guesses(user_guess)])
+        bank_names_guesses_list = sorted(
+                set([checker.get_bank_name(i) for i in checker.get_bank_name_guesses(user_guess)]) - already_subscribed)
         if len(bank_names_guesses_list) == 0:
             bot.sendMessage(update.message.chat_id, text="Никогда не слышал о таком банке")
         elif len(bank_names_guesses_list) == 1:
-            telegram_user = update.message.from_user.id
             reply = add_subscription(telegram_user, bank_names_guesses_list[0])
             bot.sendMessage(update.message.chat_id, text=reply)
         else:
@@ -108,8 +117,13 @@ def stop(bot, update):
                     text="Вы всегда можете начать общение со мной заново по команде /start",
                     reply_markup=ReplyKeyboardHide())
 
+
+def start(bot, update):
+    help(bot, update)
+
+
 bot_functions = {"help": help, "addbank": add_bank, "removebank": remove_bank,
-                 "getbanksstatuses": get_banks_statuses, "stop": stop}
+                 "getbanksstatuses": get_banks_statuses, "stop": stop, "start": start}
 
 
 def bank_name_answer_handler(bot, update, args):

@@ -39,7 +39,6 @@ def remove_subscription(user_id, bank_id):
         return "Банк не был в списке"
 
 
-
 def remove_user(user_id):
     cur.execute("DELETE FROM subscriptions WHERE user_id=%s", (user_id,))
     print(cur.query)
@@ -82,11 +81,11 @@ def get_bank_names():
 
 
 def get_norm_values(bank_id):
-	norm_values = set()
-	cur.execute("SELECT norm,value,date FROM norm_values WHERE id=%s", (bank_id,))
-	for rec in cur:
-		norm_values.add((rec[0], rec[1], rec[2]))
-	return norm_values
+    norm_values = set()
+    cur.execute("SELECT norm,value,date FROM norm_values WHERE id=%s", (bank_id,))
+    for rec in cur:
+        norm_values.add((rec[0], rec[1], rec[2]))
+    return norm_values
 
 
 def get_status(bank_id):
