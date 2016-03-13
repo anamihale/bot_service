@@ -29,9 +29,10 @@ def add_subscription(user_id, bank_id):
 def get_subscriptions():
 	cur.execute("SELECT * FROM subscriptions")
 	subscriptions = set()
-	for rec in curr:
+	for rec in cur:
 		subscriptions.add((rec[0], rec[1]))
 	return subscriptions
+
 
 def remove_subscription(user_id, bank_id):
     cur.execute("SELECT * FROM subscriptions WHERE user_id=%s AND bank_id=%s", (user_id, bank_id))
